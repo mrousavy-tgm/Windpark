@@ -146,6 +146,7 @@ Um das ganze zu einem XML zu \textit{parsen}, habe ich folgende Methode geschrie
     }
 \end{code}
 
+\clearpage
 \subsubsection{Windpark}
 \label{sec:windfarm}
 
@@ -164,6 +165,8 @@ public class Windfarm {
     public ArrayList<Windmill> mills = new ArrayList<Windmill>();
 }
 \end{code}
+
+\
 
 Außerdem habe ich folgende Methode geschrieben um die Windfarm zu XML zu \textit{parsen}:
 
@@ -184,6 +187,8 @@ Außerdem habe ich folgende Methode geschrieben um die Windfarm zu XML zu \texti
         }
     }
 \end{code}
+
+\
 
 Diese Klasse soll in der Lage sein, mit der Middleware (ActiveMQ) zu kommunizieren. Hierzu werden folgende Attribute benötigt:
 
@@ -244,6 +249,8 @@ public void stop() throws JMSException {
 }
 \end{code}
 
+\
+
 Um das ganze zu testen, bastelte ich schnell diese Main Methode zusammen, welche jede halbe Sekunde das derzeitige XML an die \gls{mom} schickt:
 
 \begin{code}{java}
@@ -274,6 +281,7 @@ public static void main(String[] args) {
 }
 \end{code}
 
+\clearpage
 \subsubsection{Zentrale}
 \label{sec:headquarters}
 
