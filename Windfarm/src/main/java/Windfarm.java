@@ -36,8 +36,13 @@ public class Windfarm {
     public static void main(String[] args) {
         try {
             System.out.println("Starting Windfarm..");
+            int id = Integer.parseInt(args[0]);
 
-            Windfarm farm = new Windfarm();
+            Windfarm farm = new Windfarm(id);
+            for (int i = 0; i < 5; i++) {
+                farm.mills.add(new Windmill(farm, i));
+            }
+
             farm.connect();
             // send XML every half second, 10 times
             for (int i = 0; i < 10; i++) {
@@ -78,7 +83,7 @@ public class Windfarm {
 
         // Create the session
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Destination destination = session.createTopic(Statics.SUBJECT);
+        Destination destination = session.createTopic(Statics.SUBJECT + id);
 
         // Create the producer.
         producer = session.createProducer(destination);

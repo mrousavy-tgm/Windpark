@@ -205,6 +205,19 @@ private MessageProducer producer = null;
 
 Sie wurden als \texttt{@XmlTransient} markiert, weil sie von der \texttt{buildXml} Methode (und somit dem \texttt{Marshaller}) nicht erfasst und \textit{geparsed} werden sollen.
 
+Ich habe folgende Statische Variablen definiert:
+
+\begin{code}{java}
+// Statics.java
+
+public class Statics {
+    public static final String USER = ActiveMQConnection.DEFAULT_USER;
+    public static final String PASSWORD = ActiveMQConnection.DEFAULT_PASSWORD;
+    public static final String URL = "failover://tcp://192.168.152.148:61616"; // Oder ActiveMQConnection.DEFAULT_BROKER_URL;
+    public static final String SUBJECT = "Windfarm";
+}
+\end{code}
+
 Für die Herstellung einer Verbindung zu dem \textbf{ActiveMQ} Service habe ich folgende Methode implementiert:
 
 \begin{code}{java}

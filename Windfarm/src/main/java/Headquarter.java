@@ -10,9 +10,10 @@ public class Headquarter {
     public static void main(String[] args) {
         try {
             System.out.println("Starting Headquarter..");
+            int id = Integer.parseInt(args[0]);
 
             Headquarter hq = new Headquarter();
-            hq.connect();
+            hq.connect(id);
             // receive a message 10 times in total
             for (int i = 0; i < 10; i++) {
                 hq.receive();
@@ -26,14 +27,14 @@ public class Headquarter {
         }
     }
 
-    public void connect() throws JMSException {
+    public void connect(int id) throws JMSException {
         ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(Statics.USER, Statics.PASSWORD, Statics.URL);
         connection = factory.createConnection();
         connection.start();
 
         // Create the session
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Destination destination = session.createTopic(Statics.SUBJECT);
+        Destination destination = session.createTopic(Statics.SUBJECT + id);
 
         // Create the consumer
         consumer = session.createConsumer(destination);
