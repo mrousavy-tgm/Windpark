@@ -1,5 +1,4 @@
-
-            import java.io.File;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
  
@@ -36,7 +35,7 @@ public class toXml {
             TransformerFactory tranFactory = TransformerFactory.newInstance();
             Transformer aTransformer = tranFactory.newTransformer();
             Source src = new DOMSource( document );
-            Result dest = new StreamResult( new File( "C:\\Users\\Semih Cakir\\Desktop\\jmschat\\src\\Windpark3.xml" ) );
+            Result dest = new StreamResult( new File( "Windpark3.xml" ) );
             aTransformer.transform( src, dest );
         } catch (Exception e)
         {
