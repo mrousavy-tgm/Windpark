@@ -5,6 +5,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @XmlRootElement
 public class Windmill {
@@ -31,6 +34,18 @@ public class Windmill {
     public double powerOutput = 0.0;
     @XmlElement
     public PowerUnit powerUnit = PowerUnit.MEGA_WATT;
+    @XmlElement
+    public double rotationSpeed;
+    @XmlElement
+    public double bladePosition;
+    @XmlElement
+    public double latency;
+
+    @XmlElement(name="timestamp")
+    public String getTimestamp() {
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        return dateFormat.format(new Date());
+    }
 
     public Windmill() {
         this(null, 0);
