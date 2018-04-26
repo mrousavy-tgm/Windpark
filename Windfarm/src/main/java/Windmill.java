@@ -29,6 +29,7 @@ public class Windmill {
     public double bladePosition;
     @XmlElement
     public double latency;
+
     public Windmill() {
         this(null, 0);
     }
@@ -63,11 +64,13 @@ public class Windmill {
         return other != null && id == other.id && farm.id == other.farm.id;
     }
 
+    // Measurement of Speed
     public enum SpeedUnit {
         KMH,
         MPH
     }
 
+    // Measurement of Power
     public enum PowerUnit {
         KILO_WATT,
         MEGA_WATT,
