@@ -1,17 +1,11 @@
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
-import java.util.ArrayList;
 
 public class Headquarter {
-    public ArrayList<Windfarm> windfarms = new ArrayList<Windfarm>();
-
     private Session session = null;
     private Connection connection = null;
     private MessageConsumer consumer = null;
-
-    public Headquarter() {
-    }
 
     public static void main(String[] args) {
         try {

@@ -62,7 +62,7 @@ Ich verwende das Package \texttt{activemq-all}, da hier alle Artifakte inkludier
 
 \subsection{Windfarm}
 
-Für eine \textbf{Windfarm} benötigen wir ein individuelles Windrad (~\ref{sec:windmill}) welches Daten misst, einen Windpark (~\ref{sec:sec:windfarm}) welcher Daten aller Windräder misst und eine Zentrale (~\ref{sec:sec:headquarters}) welche die Daten aller Windparks misst.
+Für eine \textbf{Windfarm} benötigen wir ein individuelles Windrad~\ref{sec:windmill} welches Daten misst, einen Windpark~\ref{sec:windfarm} welcher Daten aller Windräder misst und eine Zentrale~\ref{sec:headquarters} welche die Daten aller Windparks misst.
 
 \subsubsection{Windrad}
 \label{sec:windmill}
@@ -244,5 +244,110 @@ public void stop() throws JMSException {
 }
 \end{code}
 
+Um das ganze zu testen, bastelte ich schnell diese Main Methode zusammen, welche jede halbe Sekunde das derzeitige XML an die \gls{mom} schickt:
+
+\begin{code}{java}
+// Windfarm.java
+
+public static void main(String[] args) {
+    try {
+        System.out.println("Starting Windfarm..");
+
+        Windfarm farm = new Windfarm();
+        farm.connect();
+        // send XML every half second, 10 times
+        for (int i = 0; i < 10; i++) {
+            System.out.println("Sending XML..");
+            farm.send();
+            Thread.sleep(500);
+        }
+        // stop service
+        farm.stop();
+
+        System.out.println("Windfarm finished!");
+    } catch (JMSException ex) {
+        System.out.println("[Windfarm] error: " + ex);
+        ex.printStackTrace();
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+}
+\end{code}
+
 \subsubsection{Zentrale}
 \label{sec:headquarters}
+
+Die Zentrale (\textit{Headquarter}) soll lediglich die Daten von der \gls{mom} auslesen und anzeigen.
+
+Die Implementation folgt in der \texttt{Headquarter.java} Datei.
+
+Es wird wieder eine Methode zum Verbinden benötigt:
+
+\begin{code}{java}
+// Headquarter.java
+
+public void connect() throws JMSException {
+    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(Statics.USER, Statics.PASSWORD, Statics.URL);
+    connection = factory.createConnection();
+    connection.start();
+
+    // Create the session
+    session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    Destination destination = session.createTopic(Statics.SUBJECT);
+
+    // Create the consumer
+    consumer = session.createConsumer(destination);
+}
+\end{code}
+
+..sowie eine Methode zum empfangen bzw. auslesen von Messages:
+
+\begin{code}{java}
+// Headquarter.java
+
+public void receive() throws JMSException {
+    // Start receiving
+    TextMessage message = (TextMessage) consumer.receive();
+    if (message != null) {
+        System.out.println("[Headquarter] Message received: " + message.getText());
+        message.acknowledge();
+    }
+}
+\end{code}
+
+..und eine Methode zum beenden:
+
+\begin{code}{java}
+// Headquarter.java
+
+public void stop() throws JMSException {
+    connection.close();
+    consumer.close();
+    session.close();
+}
+\end{code}
+
+In diesem Beispiel werde ich den Headquarter-service starten um 10 Messages von der \gls{mom} auszulesen:
+
+\begin{code}{java}
+// Headquarter.java
+
+public static void main(String[] args) {
+    try {
+        System.out.println("Starting Headquarter..");
+
+        Headquarter hq = new Headquarter();
+        hq.connect();
+        // receive a message 10 times in total
+        for (int i = 0; i < 10; i++) {
+            hq.receive();
+        }
+        // stop the service
+        hq.stop();
+
+        System.out.println("Headquarter finished!");
+    } catch (JMSException e) {
+        e.printStackTrace();
+    }
+}
+\end{code}
