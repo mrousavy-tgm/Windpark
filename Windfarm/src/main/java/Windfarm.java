@@ -45,10 +45,10 @@ public class Windfarm {
 
             farm.connect();
             // send XML every half second, 10 times
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < Statics.SEND_COUNT; i++) {
                 System.out.println("Sending XML..");
                 farm.send();
-                Thread.sleep(500);
+                Thread.sleep(Statics.INTERVAL);
             }
             // stop service
             farm.stop();
