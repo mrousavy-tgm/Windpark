@@ -24,14 +24,37 @@ public class WpZentraleApplication implements CommandLineRunner {
 	@Autowired
 	private WindradRepository windrads;
 
-	@Override
-	public void run(String... args) throws Exception {
-
-	    /*windparks.deleteAll();
+	/*
+	Delete all existing DB storage
+	 */
+	private void deleteExisting() {
+        System.out.println("Deleting all Windparks...");
+        windparks.deleteAll();
         windparkVersions.deleteAll();
-        windrads.deleteAll();*/
+        windrads.deleteAll();
+        System.out.println("Deleted all Windparks!");
+    }
+
+	@Override
+	public void run(String[] args) {
+        System.out.println("Starting App...");
+        deleteExisting();
 
 		DataAccessLayer dal = new DataAccessLayer(windparks, windparkVersions, windrads);
-		dal.fetch();
+
+		// Fetch data all 5 seconds
+		while (true) {
+		    try {
+                System.out.println("Fetching Data...");
+                dal.fetch();
+                System.out.println("Fetched Data! Waiting 5s...");
+                Thread.sleep(5000);
+            } catch (Exception ex) {
+                System.out.println("Error: " + ex.getMessage());
+                break;
+            }
+        }
+
+        System.out.println("Program exited!");
 	}
 }

@@ -1,6 +1,5 @@
 package com.mrousavy.wpzentrale;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mrousavy.wpzentrale.model.*;
 import org.springframework.http.HttpMethod;
@@ -30,8 +29,6 @@ public class DataAccessLayer {
     Fetch and Save new data from the configured windparks
      */
     public void fetch() {
-        ArrayList<Windpark> allWindparks = new ArrayList<>(windparks.findAll());
-
         ArrayList<String> urls = getUrls();
         for (String url : urls) {
             try {
@@ -52,9 +49,8 @@ public class DataAccessLayer {
                 }
 
                 // Save WindparkVersion for that Windpark
-                Calendar calendar = Calendar.getInstance();
-                System.out.println("Now: " + calendar.toString());
-                WindparkVersion version = new WindparkVersion(windpark, calendar.toString());
+                String time = Calendar.getInstance().getTime().toString();
+                WindparkVersion version = new WindparkVersion(windpark, time);
                 windparkVersions.save(version);
             } catch (Exception e) {
                 e.printStackTrace();
