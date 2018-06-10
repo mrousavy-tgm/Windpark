@@ -1,0 +1,68 @@
+%!TEX root=../protocol.tex % Optional
+
+\section{Einführung}
+
+Diese Übung soll helfen die Funktionsweise und Einsatzmöglichkeiten eines dokumentenorientierten dezentralen Systems mit Hilfe des Frameworks Spring Data MongoDB zu demonstrieren. Die Daten werden in dieser Übung in einem NoSQL Repository gespeichert und verarbeitet.
+
+Die Umsetzung erfolgt, wie auch bei GK8.1 "Message Oriented Middleware", anhand des Beispiels von Windkraftanlagen. Es wird angenommen, dass die Werte der Windkraftanlagen am Parkrechner im XML Format vorliegen. Mit Hilfe einer REST Schnittstelle sollen die Daten an die Zentrale weitergegeben und hier mit Hilfe eines dokumentenorientiertem dezentralen Systems gespeichert werden. Von diesem System können die Daten für verschiedene Anwendungsfälle weiterverarbeitet werden.
+
+\subsection{Ziele}
+
+Das Ziel dieser Übung ist die Implementierung einer dokumentenorientiertem Middleware, die die Daten der Windparks zentral in einer entsprechenden Form ablegt. In dieser Übung soll auch ein Anwendungsfall umgesetzt werden, bei dem bestimmte Daten der Windparks in einem Browser angezeigt werden.
+
+\subsection{Voraussetzungen}
+
+\begin{itemize}
+    \item Grundlagen zu XML \& JSON \& REST
+    \item Grundlagen Architektur von verteilten Systemen
+    \item Grundlagen Architektur von verteilten Systemen
+    \item Grundlagen NoSQL
+    \item Installation MongoDB
+    \item Installation MongoDB
+    Verwendung der XML-Datenstruktur eines Parkrechner "parknodedata.xml"
+\end{itemize}
+
+\subsection{Aufgabenstellung}
+
+Implementieren Sie eine dokumentenorientierte Middleware mit Hilfe von Spring Data MongoDB und simulieren Sie die ständige Aktualisierung der Daten an der REST Schnittstelle der Parkrechner. Es sollen dabei keine Daten verloren gehen, sondern stets mit einem Zeitstempel und einem entsprechenden Format in der Zentrale abgespeichert werden. Bedenken Sie, dass die Daten aller Windparks und somit aller Windkraftanlagen zusammentreffen. Entwerfen Sie eine geeignet Datenstruktur, um eine kontinuierliche Speicherung der Daten zu gewährleisten.
+
+Die Daten liegen im XML-Format am Parkrechner vor und sollen als JSON-Struktur in MongoDB gespeichert werden.
+In welcher Form und in welchen Zeitabständen die Daten eintreffen wird von Ihnen (System Architekt) spezifiziert und umgesetz.
+
+Die Daten werden in der Zentrale in einem MongoDB Repository gespeichert und können hier zu Kontrollzwecken abgerufen werden (mongo Shell).
+
+Ebenso soll ein einfaches Webinterface für die Zentrale implementiert werden, die die Daten anhand einer von Ihnen gewählten Fragestellung auswertet und diese im Browser darstellt. Dabei soll die einfache Verarbeitung der Daten, die im JSON Format vorliegen, aufgezeigt werden.
+
+\subsection{Bewertung}
+
+\begin{itemize}
+    \item Gruppengrösse: 1 Person
+    \item Anforderungen ''überwiegend erfüllt''
+    \begin{itemize}
+        \item Installation und Konfiguration einer dokumentenorientierten Middleware mit Hilfe von Spring Data MongoDB
+        \item Entwurf und Umsetzung einer entsprechenden JSON Datenstruktur
+        \item Transformantion der XML-Daten (parknodedata.xml) in ein entsprechendes JSON-Format
+        \item Formulierung einer sinnvollen Fragestellung für einen Anwendungsfall in der Zentrale und deren Abfrage in einer Mongo Shell
+        \item Umsetzung von einem Parkrechner
+    \end{itemize}
+    \item Anforderungen ''zur Gänze erfüllt''
+    \begin{itemize}
+        \item Konzeption und Implementierung der kontinuierlichen Speicherung der Daten (Cronjob, Scheduler, Trigger, etc.)
+        \item Implementieren eines Webinterfaces zur Darstellung der Fragestellung von oben.
+        \item Logging der neuen Daten und ggf. der auftretenden Probleme
+        \item Umsetzung von n Parkrechnern
+    \end{itemize}
+\end{itemize}
+
+\subsection{Fragestellung für Protokoll}
+
+\begin{itemize}
+    \item Nennen Sie 5 Vorteile eines NoSQL Repository im Gegensatz zu einem relationalen DBMS
+    \item Nennen Sie 4 Nachteile eines NoSQL Repository im Gegensatz zu einem relationalen DBMS
+    \item Welche Schwierigkeiten ergeben sich bei der Zusammenführung der Daten?
+    \item Können die Daten der MongoDB von Mitarbeitern geändert werden?
+        Ja/Nein, Begründen Sie Ihre Antwort.
+    \item Beschreiben Sie die wichtigsten Eigenschaften des Spring Frameworks?
+    \item Was versteht man unter dem Spring Boot Projekt?
+    \item Nennen Sie jeweils 3 Argumente für und gegen den Einsatz von Spring bei der Entwicklung solcher Projekte
+\end{itemize}
