@@ -8,38 +8,25 @@ public class Windpark {
     @Id
     private String id;
 
-    private String latestTimestamp;
-
-    private ArrayList<WindparkVersion> versions;
+    private ArrayList<Windrad> windrad;
 
     public Windpark(String id) {
         this.id = id;
-        this.versions = new ArrayList<>();
+        this.windrad = new ArrayList<>();
     }
 
-    public void addVersion(WindparkVersion version){
-        this.versions.add(version);
-        this.latestTimestamp = version.getTimeStamp();
+    public Windpark() {
+    }
+
+    public void addWindrad(Windrad windrad){
+        this.windrad.add(windrad);
+    }
+
+    public ArrayList<Windrad> getWindrad() {
+        return windrad;
     }
 
     public String getId() {
         return id;
-    }
-
-    public String getLatestTimestamp() {
-        return latestTimestamp;
-    }
-
-    public ArrayList<WindparkVersion> getVersions() {
-        return versions;
-    }
-
-    public WindparkVersion getLatestWindpark(){
-        for(WindparkVersion windpark: this.versions){
-            if(windpark.getTimeStamp().equals(this.latestTimestamp)){
-                return windpark;
-            }
-        }
-        return null;
     }
 }

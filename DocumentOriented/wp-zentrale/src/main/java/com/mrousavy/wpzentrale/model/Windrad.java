@@ -7,29 +7,25 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Windrad {
-
+    @Id
     private String id;
 
-    @Id
-    private String timeStamp;
+    private String power;
 
-    private double power;
+    private String blindpower;
 
-    private double blindpower;
+    private String windspeed;
 
-    private double windspeed;
+    private String rotationspeed;
 
-    private double rotationspeed;
+    private String temperature;
 
-    private double temperature;
+    private String bladeposition;
 
-    private double bladeposition;
+    private String transfertime;
 
-    private double transfertime;
-
-    public Windrad(String id, String timeStamp, double power, double blindpower, double windspeed, double rotationspeed, double temperature, double bladeposition, double transfertime) {
+    public Windrad(String id, String power, String blindpower, String windspeed, String rotationspeed, String temperature, String bladeposition, String transfertime) {
         this.id = id;
-        this.timeStamp = timeStamp;
         this.power = power;
         this.blindpower = blindpower;
         this.windspeed = windspeed;
@@ -50,35 +46,31 @@ public class Windrad {
         return id;
     }
 
-    public double getPower() {
+    public String getPower() {
         return power;
     }
 
-    public String getTimeStamp() {
-        return timeStamp;
-    }
-
-    public double getBlindpower() {
+    public String getBlindpower() {
         return blindpower;
     }
 
-    public double getWindspeed() {
+    public String getWindspeed() {
         return windspeed;
     }
 
-    public double getRotationspeed() {
+    public String getRotationspeed() {
         return rotationspeed;
     }
 
-    public double getTemperature() {
+    public String getTemperature() {
         return temperature;
     }
 
-    public double getBladeposition() {
+    public String getBladeposition() {
         return bladeposition;
     }
 
-    public double getTransfertime() {
+    public String getTransfertime() {
         return transfertime;
     }
 }

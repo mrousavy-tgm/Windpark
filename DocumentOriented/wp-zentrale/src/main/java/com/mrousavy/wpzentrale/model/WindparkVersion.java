@@ -7,33 +7,26 @@ import java.util.Date;
 import java.util.List;
 
 public class WindparkVersion {
-
     private String id;
 
     @Id
     private String timeStamp;
 
-    private List<Windrad> windrads;
+    private Windpark windpark;
 
-    public WindparkVersion(String id, String timeStamp) {
-        this.id = id;
-        this.windrads = new ArrayList<>();
+    public WindparkVersion(Windpark windpark, String timeStamp) {
+        this.windpark = windpark;
         this.timeStamp = timeStamp;
     }
 
-    public void addWindrad(Windrad windrad){
-        this.windrads.add(windrad);
+    public WindparkVersion() {
     }
 
     public String getTimeStamp(){
         return timeStamp;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public List<Windrad> getWindrads() {
-        return windrads;
+    public Windpark getWindpark() {
+        return windpark;
     }
 }

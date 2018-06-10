@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DataAccessLayer {
     private static final String FILE_NAME = "config.txt";
@@ -39,33 +40,22 @@ public class DataAccessLayer {
 
                 // Parse JSON to WindparkVersion
                 ObjectMapper mapper = new ObjectMapper();
-                WindparkVersion windparkVersion = mapper.readValue(data, WindparkVersion.class);
+                WindparkWrapper wrapper = mapper.readValue(data, WindparkWrapper.class);
+                Windpark windpark = wrapper.windpark;
 
-                // Save each Windrad in WindparkVersion
-                for (Windrad windrad : windparkVersion.getWindrads()) {
+                // Save Windpark
+                windparks.save(windpark);
+
+                // Save each Windrad in Windpark
+                for (Windrad windrad : windpark.getWindrad()) {
                     windrads.save(windrad);
                 }
 
-                // Save WindparkVersion
-                windparkVersions.save(windparkVersion);
-
-                // Add WindparkVersion to Windpark
-                boolean found = false;
-                for (Windpark windpark : allWindparks) {
-                    if (windpark.getId().equals(windparkVersion.getId())) {
-                        windpark.addVersion(windparkVersion);
-                        windparks.save(windpark);
-                        found = true;
-                        break;
-                    }
-                }
-
-                // If there was no saved Windpark with that ID, create it
-                if (!found) {
-                    Windpark windpark = new Windpark(windparkVersion.getId());
-                    windpark.addVersion(windparkVersion);
-                    windparks.save(windpark);
-                }
+                // Save WindparkVersion for that Windpark
+                Calendar calendar = Calendar.getInstance();
+                System.out.println("Now: " + calendar.toString());
+                WindparkVersion version = new WindparkVersion(windpark, calendar.toString());
+                windparkVersions.save(version);
             } catch (Exception e) {
                 e.printStackTrace();
             }
