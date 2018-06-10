@@ -322,6 +322,61 @@ Um die einzelnen Daten nun von den Windparks zu bekommen, erstellen wir einen \t
     \item Auf MongoDB Datenbank fortlaufend speichern
 \end{itemize}
 
+Es wird die Java Klasse \texttt{DataAccessLayer.java} erstellt, welche die einzelnen Mongo Repositories als Klassenvariablen verwendet:
+
+\begin{code}{java}
+    public class DataAccessLayer {
+        // MongoDB Repositories
+        private WindparkRepository windparks;
+        private WindparkVersionRepository windparkVersions;
+        private WindradRepository windrads;
+
+
+        public DataAccessLayer(WindparkRepository windparks, WindparkVersionRepository windparkVersions, WindradRepository windrads) {
+            this.windparks = windparks;
+            this.windparkVersions = windparkVersions;
+            this.windrads = windrads;
+        }
+
+        ...
+\end{code}
+
+Außerdem verwenden wir eine Konfigurationsdatei welche alle Windpark URLs enthält, diese wird folgendermaßen ausgelesen:
+
+\begin{code}{java}
+    private static final String FILE_NAME = "urls.txt";
+
+    public ArrayList<String> getUrls() {
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
+            ArrayList<String> urls = new ArrayList<>();
+
+            String currentLine;
+            while ((currentLine = br.readLine()) != null) {
+                urls.add(currentLine.trim());
+            }
+
+            return urls;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+\end{code}
+
+Die JSON Informationen der einzelnen Windparks können wir mittels folgender Funktion ermitteln:
+
+\begin{code}{java}
+    public static String getWindparkData(String url) throws URISyntaxException {
+        RestTemplate rest = new RestTemplate();
+        return rest.exchange(new URI(url), HttpMethod.GET, null, String.class).getBody();
+    }
+\end{code}
+
+Hierbei ist aufzupassen, dass die URLs im richtigen format sind.
+
+
+
+TODO: rest
 
 
 

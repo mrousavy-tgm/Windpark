@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class DataAccessLayer {
-    private static final String FILE_NAME = "config.txt";
+    private static final String FILE_NAME = "urls.txt";
     private WindparkRepository windparks;
     private WindparkVersionRepository windparkVersions;
     private WindradRepository windrads;
