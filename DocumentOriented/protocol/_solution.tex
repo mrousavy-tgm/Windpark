@@ -67,7 +67,7 @@ Definiert werden \textbf{ReST Controller} in \textbf{Spring} mittels der \texttt
 
 Sobald also die Spring Application über die URL beispielsweise in einem Browser aufgerufen wird, sucht \textbf{Spring} einen passenden \textbf{ReST Controller} um die Anfrage zu verarbeiten. Dies gelangt zur Laufzeit mittels der vorhin erwähnten \texttt{@RestController} Annotation.
 
-Wir können einerseits einen \textit{Index} (also die Startseite, beispielsweise erreichbar unter \texttt{172.0.1.2}), oder eine Subseite (beispielsweise erreichbar unter \texttt{172.0.1.2/xml}) definieren. Hierbei verwenden wir die Spring Web Annotation \texttt{@GetMapping(String)}.
+Wir können einerseits einen \textit{Index} (also die Startseite, beispielsweise erreichbar unter \texttt{172.0.1.2}), oder eine Subseite (beispielsweise erreichbar unter \texttt{172.0.1.2/hello}) definieren. Hierbei verwenden wir die Spring Web Annotation \texttt{@GetMapping(String)}.
 
 Um einen Wert (\texttt{String}) zurückzugeben, wird die Spring Web Annotation {\texttt{@ResponseBody}} verwendet.
 
@@ -85,8 +85,6 @@ Der Windpark Controller ist so aufgebaut, dass damit gerechnet wird, dass ein vo
 
 Um eine Text-Datei in Java 7 zu lesen, wird der \texttt{BufferedReader} verwendet. Es wird mit der \texttt{BufferedReader.getLine()} Methode gearbeitet.
 
-Der vollständige Code des \textbf{ReST Controllers} sieht nun folgendermaßen aus:
-
 \begin{code}{java}
     package com.mrousavy.wpwindpark;
 
@@ -97,18 +95,83 @@ Der vollständige Code des \textbf{ReST Controllers} sieht nun folgendermaßen a
     @RestController
     public class WindparkRestController {
 
-        @GetMapping("/xml")
-        @ResponseBody
-        public String getXml() {
-            try (BufferedReader br = new BufferedReader(new FileReader("windpark.xml"))) {
-                StringBuilder xml = new StringBuilder();
+        private final String FILE_NAME = "parknodedata.xml";
+
+        public String readXml() throws IOException {
+            try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
+                StringBuilder builder = new StringBuilder();
 
                 String sCurrentLine;
                 while ((sCurrentLine = br.readLine()) != null) {
-                    xml.append(sCurrentLine);
+                    builder.append(sCurrentLine);
                 }
 
-                return xml.toString();
+                return builder.toString();
+            }
+        }
+    }
+\end{code}
+
+Außerdem wird die Dependency \texttt{org.JSON} verwendet, um das XML zu einem JSON Format zu konvertieren:
+
+\begin{code}{properties}
+    dependencies {
+        compile('org.springframework.boot:spring-boot-starter-data-rest')
+        compile('org.springframework.boot:spring-boot-starter-web')
+        compile('org.jdom:jdom2:2.0.6')
+        compile('xerces:xercesImpl:2.11.0')
+        compile group: 'org.json', name: 'json', version: '20180130'
+        testCompile('org.springframework.boot:spring-boot-starter-test')
+    }
+\end{code}
+
+Der vollständige Code des \textbf{ReST Controllers} sieht nun folgendermaßen aus:
+
+\begin{code}{java}
+    @RestController
+    public class WindparkRestController {
+
+        private final String FILE_NAME = "parknodedata.xml";
+
+        public String readXml() throws IOException {
+            try (BufferedReader br = new BufferedReader(new FileReader(FILE_NAME))) {
+                StringBuilder builder = new StringBuilder();
+
+                String sCurrentLine;
+                while ((sCurrentLine = br.readLine()) != null) {
+                    builder.append(sCurrentLine);
+                }
+
+                return builder.toString();
+            }
+        }
+
+        @GetMapping("/xml")
+        @ResponseBody
+        public String getXml() {
+            System.out.println("Working Directory = " + System.getProperty("user.dir"));
+
+            try {
+                return readXml();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "<error>" + e.getMessage() + "</error>";
+            }
+        }
+
+
+        @GetMapping("/json")
+        @ResponseBody
+        public String getJson() {
+            System.out.println("Working Directory = " + System.getProperty("user.dir"));
+
+            try {
+                String xml = readXml();
+
+                JSONObject json = XML.toJSONObject(xml);
+                String prettyJson = json.toString(4);
+                System.out.println("Read JSON: " + prettyJson);
+                return prettyJson;
             } catch (Exception e) {
                 e.printStackTrace();
                 return "<error>" + e.getMessage() + "</error>";
@@ -153,7 +216,15 @@ Zuletzt wird der Tomcat Server gestartet:
 Die Spring Application ist nun erreichbar unter \texttt{localhost:8081/xml}.
 
 \begin{figure}
-    \caption{Spring Application Web-Aufruf}
+    \caption{Spring Application Web-Aufruf (JSON)}
+    \includegraphics[width=15cm]{images/spring-app-json}
+    \centering
+\end{figure}
+
+Und falls es irgendeinen Fehler in der Applikation gibt:
+
+\begin{figure}
+    \caption{Spring Application Web-Aufruf - Error caught}
     \includegraphics[width=15cm]{images/spring-app-filenotfound}
     \centering
 \end{figure}
