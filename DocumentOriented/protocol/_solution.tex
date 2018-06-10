@@ -36,6 +36,8 @@ Sowie folgende Frameworks für das Windpark Projekt:
 \clearpage
 \subsection{Windpark}
 
+\subsubsection{Allgemein}
+
 Eine Spring Web Application wird nun einen einzelnen Windpark darstellen.
 
 Es wird also zusätzlich zu folgender Application Klasse:
@@ -55,6 +57,8 @@ Es wird also zusätzlich zu folgender Application Klasse:
 \end{code}
 
 .., welche mittels des \textit{Spring Initializr} automatisch erstellt wurde, noch ein \textbf{ReST Controller} erstellt.
+
+\subsubsection{ReST Controller}
 
 Dieser \textbf{ReST Controller} kümmert sich um alle Anfragen über \textit{HTTP/HTTPS}, und liefert einen \texttt{String} zurück.
 
@@ -111,6 +115,8 @@ Um eine Text-Datei in Java 7 zu lesen, wird der \texttt{BufferedReader} verwende
         }
     }
 \end{code}
+
+\subsubsection{JSON}
 
 Außerdem wird die Dependency \texttt{org.JSON} verwendet, um das XML zu einem JSON Format zu konvertieren:
 
@@ -180,6 +186,8 @@ Der vollständige Code des \textbf{ReST Controllers} sieht nun folgendermaßen a
     }
 \end{code}
 
+\subsubsection{Port}
+
 Da wir mehrere Windparks auf einem Host starten möchten, müssen wir Spring mitteilen, verschiedene Ports für den Tomcat Server zu verwenden.
 
 Hierzu verwenden wir die \texttt{application.properties} Datei:
@@ -188,6 +196,8 @@ Hierzu verwenden wir die \texttt{application.properties} Datei:
     server.port = 8081
 \end{code}
 
+
+\subsubsection{Start}
 
 Sobald wir die Main-Methode starten, wird der Spring Server initialisiert:
 
@@ -230,10 +240,10 @@ Und falls es irgendeinen Fehler in der Applikation gibt:
 \end{figure}
 
 
-
-
 \clearpage
 \subsection{Zentrale}
+
+\subsubsection{Allgemein}
 
 Nun erstellen wir eine \textbf{Spring Application} welche eine \textbf{Windpark Zentrale} repräsentiert.
 
@@ -246,6 +256,35 @@ Der Aufbau dieser \textbf{Spring Application} ist folgendermaßen gedacht:
     \item Verwaltet werden diese Daten mittels den \textbf{MongoDB} Tools (Mongo Shell)
     \item Zusätzlich soll ein Webinterface erstellt werden, wo die Daten von der Mongo Datenbank angezeigt werden.
 \end{itemize}
+
+\subsubsection{Model}
+
+Es wird ein \textbf{Model} definiert, welches die einzelnen Windräder, Windparks und Windpark Versionen als POJOs (\textbf{P}lain \textbf{O}ld \textbf{J}ava \textbf{O}bjects) repräsentiert.
+
+Also werden die Klassen \texttt{Windpark.java}, \texttt{Windrad.java} und \texttt{WindparkVersion.java} erstellt, welche für den \textbf{MongoDB} Zugriff auch noch Mongo Repositories benötigen.
+
+Ein Mongo Repository verwaltet die Schnittstelle zwischen der Java Runtime und dem MongoDB Treiber. Für den Java Code ist es also quasi die Schnittstelle zur Datenbank.
+
+Eine Repository könnte beispielsweise folgendermaßen aussehen:
+
+\begin{code}{java}
+    public interface WindparkRepository extends MongoRepository<Windpark, String> {
+        public Windpark findByid(String id);
+    }
+\end{code}
+
+\subsubsection{Data Access Layer}
+
+Um die einzelnen Daten nun von den Windparks zu bekommen, erstellen wir einen \textbf{Data Access Layer}, welcher folgende Aufgaben hat:
+
+\begin{itemize}
+    \item Windpark Zentrale Config lesen (zu überwachende Windparks auslesen)
+    \item Windparks JSON auslesen über deren ReST Schnittstelle
+    \item Einzelne Windparks Zusammenfassen
+    \item Auf MongoDB Datenbank fortlaufend speichern
+\end{itemize}
+
+
 
 
 

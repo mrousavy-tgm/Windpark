@@ -39,6 +39,10 @@ public class Windrad {
         this.transfertime = transfertime;
     }
 
+    public Windrad(String id) {
+        this.id = id;
+    }
+
     public Windrad() {
     }
 
