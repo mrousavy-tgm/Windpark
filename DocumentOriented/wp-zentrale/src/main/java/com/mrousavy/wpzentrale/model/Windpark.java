@@ -29,4 +29,9 @@ public class Windpark {
     public String getId() {
         return id;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Windpark && ((Windpark) o).id.equals(this.id);
+    }
 }

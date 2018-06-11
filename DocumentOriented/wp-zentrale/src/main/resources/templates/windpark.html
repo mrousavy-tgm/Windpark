@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <title>Zentrale - Windpark</title>
+</head>
+<body>
+
+
+    <div class="jumbotron">
+
+        <h1 class="text-center">Windpark <span th:text="${windpark.id}"></span></h1>
+
+        <div class="row">
+            <div class="col-sm-4" th:each="windrad,iter : ${windpark.windrad}">
+                <div class="card" style="width: 38rem;">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="card" style="width: 17rem;">
+                                <div class="card-body" >
+                                    <h5>Windrad: <span th:text="${windrad.id}"></span></h5>
+                                    Id: <span th:text="${windrad.id}">id</span><br/>
+                                    power: <span th:text="${windrad.power}">id</span><br/>
+                                    blindpower: <span th:text="${windrad.blindpower}">id</span><br/>
+                                    windspeed: <span th:text="${windrad.windspeed}">id</span><br/>
+                                    rotationspeed: <span th:text="${windrad.rotationspeed}">id</span><br/>
+                                    temperature: <span th:text="${windrad.temperature}">id</span><br/>
+                                    bladeposition: <span th:text="${windrad.bladeposition}">id</span><br/>
+                                    transfertime: <span th:text="${windrad.transfertime}">id</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+</body>
+</html>

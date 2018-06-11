@@ -277,6 +277,8 @@ Und falls es irgendeinen Fehler in der Applikation gibt:
     \centering
 \end{figure}
 
+Nun muss die Applikation zu einer \texttt{jar} gepackt werden, was mittels \textit{Artifacts} in \textit{IntelliJ IDEA} geschieht. Es wird also ein \texttt{jar} Artifact mit der Main-Class erstellt, welches dann das ausführen mehrerer Windparks unter verschiedenen Ports auf einem Rechner ermöglicht.
+
 
 \clearpage
 \subsection{Zentrale}
@@ -301,6 +303,40 @@ Es wird ein \textbf{Model} definiert, welches die einzelnen Windräder, Windpark
 
 Also werden die Klassen \texttt{Windpark.java}, \texttt{Windrad.java} und \texttt{WindparkVersion.java} erstellt, welche für den \textbf{MongoDB} Zugriff auch noch Mongo Repositories benötigen.
 
+\begin{code}{java}
+    public class Windpark {
+        @Id
+        private String id;
+
+        private ArrayList<Windrad> windrad;
+
+        public Windpark(String id) {
+            this.id = id;
+            this.windrad = new ArrayList<>();
+        }
+
+        public Windpark() {
+        }
+
+        public void addWindrad(Windrad windrad){
+            this.windrad.add(windrad);
+        }
+
+        public ArrayList<Windrad> getWindrad() {
+            return windrad;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o instanceof Windpark && ((Windpark) o).id.equals(this.id);
+        }
+    }
+\end{code}
+
 Ein Mongo Repository verwaltet die Schnittstelle zwischen der Java Runtime und dem MongoDB Treiber. Für den Java Code ist es also quasi die Schnittstelle zur Datenbank.
 
 Eine Repository könnte beispielsweise folgendermaßen aussehen:
@@ -311,6 +347,25 @@ Eine Repository könnte beispielsweise folgendermaßen aussehen:
     }
 \end{code}
 
+Die Spring Application kennt jedoch noch keine Mongo Datenbank, deshalb muss ein Connection String spezifiziert werden.
+
+Hierzu verwenden wir die \texttt{application.properties} Datei:
+
+\begin{code}{properties}
+    spring.data.mongodb.host=172.17.0.2
+    spring.data.mongodb.port=27017
+    spring.data.mongodb.database=windpark
+\end{code}
+
+..dies ist der Mongo Docker Container welcher folgendermaßen gestartet werden kann:
+
+\begin{code}{sh}
+    docker run -p 27017:27017 --name mongodb -d mongo:latest
+\end{code}
+
+
+
+\clearpage
 \subsubsection{Data Access Layer}
 
 Um die einzelnen Daten nun von den Windparks zu bekommen, erstellen wir einen \textbf{Data Access Layer}, welcher folgende Aufgaben hat:
@@ -340,6 +395,8 @@ Es wird die Java Klasse \texttt{DataAccessLayer.java} erstellt, welche die einze
 
         ...
 \end{code}
+
+..wobei der DataAccessLayer auch \texttt{@AutoWired} Repositories haben kann, also Repositories die von Spring automatisch mit einer Implementierung initialisiert werden.
 
 Außerdem verwenden wir eine Konfigurationsdatei welche alle Windpark URLs enthält, diese wird folgendermaßen ausgelesen:
 
@@ -374,10 +431,216 @@ Die JSON Informationen der einzelnen Windparks können wir mittels folgender Fun
 
 Hierbei ist aufzupassen, dass die URLs im richtigen format sind.
 
+Es wird also stets eine \texttt{urls.txt} Datei im \textit{Working Directory} benötigt, welche beispielsweise folgendermaßen aufgebaut ist:
+
+\begin{code}{properties}
+    http://localhost:8081/json
+    http://localhost:8082/json
+    http://localhost:8083/json
+    http://86.23.10.40/getWindparkInfo
+\end{code}
+
+Nun werden die einzelnen Windpark-Informationen von den Servern geholt:
+
+\begin{figure}
+    \caption{Spring App 5s Fetching}
+    \includegraphics[width=15cm]{images/spring-app-fetching}
+    \centering
+\end{figure}
 
 
-TODO: rest
 
+
+
+
+
+
+
+\clearpage
+\subsubsection{ReST Schnittstelle}
+
+Um einen Überblick der Zentrale zu bekommen, wird zusätzlich eine ReST Schnittstelle entworfen welche alle Windparks anzeigen kann.
+
+
+\begin{code}{java}
+    @RestController
+    public class ZentraleRestController {
+        private final WindparkRepository windparks;
+
+        private final WindparkVersionRepository windparkVersions;
+
+        private final WindradRepository windrads;
+
+        @Autowired
+        public ZentraleRestController(WindparkRepository windparks, WindparkVersionRepository windparkVersions, WindradRepository windrads) {
+            this.windparks = windparks;
+            this.windparkVersions = windparkVersions;
+            this.windrads = windrads;
+        }
+
+        ...
+\end{code}
+
+Hierbei werden folgende ReST Schnittstellen implementiert:
+
+\begin{code}{java}
+    @GetMapping("/uniquewindparks")
+    public List<Windpark> uniqueWindparks(){
+        List<WindparkVersion> allWindparks = windparkVersions.findAll();
+        List<Windpark> windparks = new ArrayList<>();
+        for(WindparkVersion version: allWindparks){
+            if(!windparks.contains(version.getWindpark())){
+                windparks.add(version.getWindpark());
+            }
+        }
+        return windparks;
+    }
+
+    @GetMapping("/windparks")
+    public List<Windpark> windparks(){
+        return windparks.findAll();
+    }
+
+    @GetMapping("/windpark")
+    public Windpark windpark(@RequestParam(value="id") String id){
+        return windparks.findByid(id);
+    }
+
+    @GetMapping("/fetch")
+    public void fetch() {
+        DataAccessLayer dal = new DataAccessLayer(windparks, windparkVersions, windrads);
+        dal.fetch();
+    }
+\end{code}
+
+Unter \texttt{localhost/windparks}:
+
+\begin{figure}
+    \caption{Spring App Windparks}
+    \includegraphics[width=15cm]{images/spring-app-windparks}
+    \centering
+\end{figure}
+
+Unter \texttt{localhost/windrads}:
+
+\begin{figure}
+    \caption{Spring App Windrads}
+    \includegraphics[width=15cm]{images/spring-app-windrads}
+    \centering
+\end{figure}
+
+
+
+
+\clearpage
+\subsubsection{GUI}
+
+Zusätzlich wird eine kleine grafische Oberfläche implementiert, welche in einer Listenform die Windparks anzeigt.
+
+Hierzu erstellen wir die Websites \texttt{windpark.html} und \texttt{windparks.html} im \texttt{src/main/resources/templates} Ordner.
+
+Es wird mit Thymeleaf, ein \textit{HTML Preprocessor} für Java, gearbeitet.
+
+Hierbei wird für Variablen ein einfacher \textit{Placeholder} eingesetzt, welcher im Format von \texttt{\$\{variablenname\}} geschrieben wird.
+
+\begin{code}{html}
+    <div class="jumbotron">
+        <h1 class="text-center">Alle Windparks</h1>
+        <div class="row">
+            <div class="col-sm-4" th:each="windpark : ${windparks}">
+                <h1 class="text-center">Windpark <span th:text="${windpark.id}"></span></h1>
+                <div class="row">
+                    <div class="col-sm-4" th:each="windrad,iter : ${windpark.windrad}">
+                        <div class="card" style="width: 38rem;">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="card" style="width: 17rem;">
+                                        <div class="card-body" >
+                                            <h5>Windrad: <span th:text="${windrad.id}"></span></h5>
+                                            Id: <span th:text="${windrad.id}">id</span><br/>
+                                            power: <span th:text="${windrad.power}">id</span><br/>
+                                            blindpower: <span th:text="${windrad.blindpower}">id</span><br/>
+                                            windspeed: <span th:text="${windrad.windspeed}">id</span><br/>
+                                            rotationspeed: <span th:text="${windrad.rotationspeed}">id</span><br/>
+                                            temperature: <span th:text="${windrad.temperature}">id</span><br/>
+                                            bladeposition: <span th:text="${windrad.bladeposition}">id</span><br/>
+                                            transfertime: <span th:text="${windrad.transfertime}">id</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+\end{code}
+
+Für das einsetzen der Variablen-Werte müssen wir einen \textit{Controller} für die \textit{View} implementieren:
+
+\begin{code}{java}
+    @Controller
+    public class ViewController {
+
+        private final WindparkRepository windparks;
+        private final WindparkVersionRepository windparkVersions;
+
+        @Autowired
+        public ViewController(WindparkRepository windparks, WindparkVersionRepository windparkVersions) {
+            this.windparks = windparks;
+            this.windparkVersions = windparkVersions;
+        }
+
+        ...
+\end{code}
+
+Es werden nun zwei \textbf{GET} mappings definiert:
+
+\begin{code}{java}
+    @GetMapping("/graphic/windparks")
+    public String windparks(Model model){
+        List<WindparkVersion> allWindparks = windparkVersions.findAll();
+        List<Windpark> windparks = new ArrayList<>();
+        for(WindparkVersion version: allWindparks){
+            if(!windparks.contains(version.getWindpark())){
+                windparks.add(version.getWindpark());
+            }
+        }
+
+        model.addAttribute("windparks", windparks);
+
+        return "windparks";
+    }
+
+    @GetMapping("/graphic/windpark")
+    public String windpark(Model model, @RequestParam(value="id") String id){
+        model.addAttribute("windpark", windparks.findByid(id));
+        return "windpark";
+    }
+\end{code}
+
+Beim Aufrufen von \texttt{localhost/graphic/windparks} erscheint nun folgende grafische Oberfläche:
+
+\begin{figure}
+    \caption{Spring App Website}
+    \includegraphics[width=15cm]{images/spring-app-gui}
+    \centering
+\end{figure}
+
+
+
+
+
+\clearpage
+\subsubsection{MongoDB}
+
+Die Mitarbeiter können außerdem auch in der MongoDB Shell alle Windparks anzeigen lassen:
+
+\begin{figure}
+    \caption{MongoDB all Windrads}
+    \includegraphics[width=15cm]{images/mongo-windrads}
+    \centering
+\end{figure}
 
 
 
@@ -387,11 +650,31 @@ TODO: rest
 
 \begin{itemize}
     \item Nennen Sie 5 Vorteile eines NoSQL Repository im Gegensatz zu einem relationalen DBMS
+        \subitem 1. Skalierbarkeit
+        \subitem 2. Exakt anpassbar auf gegebene Situation
+        \subitem 3. Sehr einfach zu verwenden und verwalten
+        \subitem 4. Gut aufteilbar in Cluster/Verteilte Systeme
+        \subitem 5. Können große Datenmengen verwalten
     \item Nennen Sie 4 Nachteile eines NoSQL Repository im Gegensatz zu einem relationalen DBMS
+        \subitem 1. Neue Technologie (Bugs)
+        \subitem 2. Keine universelle Sprache wie \textbf{SQL}
+        \subitem 3. Nicht genug Support
+        \subitem 4. Nicht genug Hilfe
     \item Welche Schwierigkeiten ergeben sich bei der Zusammenführung der Daten?
+        \subitem \textit{Unique Constraints} dürfen nicht verletzt werden, außerdem muss man aufpassen dass es immer Listen sind und mehrere Elemente (Windparks) zugelassen werden können.
     \item Können die Daten der MongoDB von Mitarbeitern geändert werden?
-        Ja/Nein, Begründen Sie Ihre Antwort.
+        \subitem Ja, da die \texttt{MongoRepository} sich um Änderungen der Datenbank kümmert.
     \item Beschreiben Sie die wichtigsten Eigenschaften des Spring Frameworks?
+        \subitem Es gibt Spring Boot welches Templates bereitstellt
+        \subitem Es gibt die AutoWired Annotation welches automatisch eine Implementierung bereitstellt
+        \subitem Spring ist ein Web Framework, somit sind ReST Schnittstellen sehr schnell implementiert
     \item Was versteht man unter dem Spring Boot Projekt?
+        \subitem Ein \textit{Spring Boot Projekt} ist ein Projekt, welches mittels dem \textit{Spring Boot} Framework automatisch Module und Komponenten eingefügt bekommt wo es benötigt wird. Es sind also Templates.
     \item Nennen Sie jeweils 3 Argumente für und gegen den Einsatz von Spring bei der Entwicklung solcher Projekte
+        \subitem + 1. Es ist sehr schnell die Entwicklungsumgebung aufzusetzen
+        \subitem + 2. Es besteht bereits eine gute Codebase, man muss "\textit{das Rad nicht neu erfinden}".
+        \subitem + 3. Es bietet guten Support an
+        \subitem - 1. Es kann nur Tomcat verwendet werden
+        \subitem - 2. Andere Frameworks wie NodeJS bieten eine einfachere Umgebung
+        \subitem - 3. Der Projektumfang ist zu gering für Spring
 \end{itemize}
