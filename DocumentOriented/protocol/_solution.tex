@@ -642,6 +642,18 @@ Die Mitarbeiter können außerdem auch in der MongoDB Shell alle Windparks anzei
     \centering
 \end{figure}
 
+Die Mongo Abfragen schauen folgendermaßen aus:
+
+\begin{code}{python}
+    show databases
+    use windpark
+
+    show tables
+
+    db.windpark.find().pretty()
+    db.windrad.find().pretty()
+    db.windparkVersion.find().pretty()
+\end{code}
 
 
 
